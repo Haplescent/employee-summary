@@ -1,45 +1,47 @@
-const Manager = require("./lib/Manager");
-const Engineer = require("./lib/Engineer");
-const Intern = require("./lib/Intern").default;
+const { Manager } = require("./lib/Manager");
+const { Engineer } = require("./lib/Engineer");
+const { Intern } = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const render = require("./lib/htmlRenderer");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
-const render = require("./lib/htmlRenderer");
-
 const renderThis = [];
+let id = 0;
 
-inquirerAboutEmployee = function (num) {
+inquirerAboutEmployee = function () {
   return inquirer
     .prompt([
       {
         name: `name`,
         message: `
-      What is this employee's name?`,
+What is this employee's name?`,
       },
       {
         name: `email`,
         message: `
-      What is this employee's email?`,
+What is this employee's email?`,
       },
     ])
     .then((answer) => {
       console.log(answer);
+      return answer;
     })
     .catch((err) => {
       throw err;
     });
 };
-inquirerAboutManager = function (num) {
-  inquirerAboutEmployee(num).then((employeeResponse) => {
+
+inquirerAboutManager = function () {
+  inquirerAboutEmployee().then((employeeResponse) => {
     inquirer
       .prompt([
         {
           name: `OfficeNum`,
           message: `
-        What is this Manager's Office Number?`,
+What is this Manager's Office Number?`,
         },
       ])
       .then((managerResponse) => {
@@ -47,33 +49,111 @@ inquirerAboutManager = function (num) {
       })
       .then((finalResponse) => {
         console.log(finalResponse);
+        let e = new Manager(
+          finalResponse.name,
+          id,
+          finalResponse.email,
+          finalResponse.OfficeNum
+        );
+        id += 1;
+        console.log(e);
+        renderThis.push(e);
+        console.log(renderThis);
+        return finalResponse;
+      })
+      .then(() => {
+        inquirerMenu();
       });
   });
 };
-inquirerAboutEngineer = function (num) {
-  inquirerAboutEmployee(num);
+
+inquirerAboutEngineer = function () {
+  inquirerAboutEmployee().then((employeeResponse) => {
+    inquirer
+      .prompt([
+        {
+          name: `github`,
+          message: `
+What is this Emgineer's github username?`,
+        },
+      ])
+      .then((engineerResponse) => {
+        return { ...employeeResponse, ...engineerResponse };
+      })
+      .then((finalResponse) => {
+        console.log(finalResponse);
+        let e = new Engineer(
+          finalResponse.name,
+          id,
+          finalResponse.email,
+          finalResponse.github
+        );
+        id += 1;
+        console.log(e);
+        renderThis.push(e);
+        console.log(renderThis);
+        return finalResponse;
+      })
+      .then(() => {
+        inquirerMenu();
+      });
+  });
 };
-inquirerAboutIntern = function (num) {
-  inquirerAboutEmployee(num);
+
+inquirerAboutIntern = async function () {
+  inquirerAboutEmployee().then((employeeResponse) => {
+    inquirer
+      .prompt([
+        {
+          name: `school`,
+          message: `
+What school did this intern go to?`,
+        },
+      ])
+      .then((internResponse) => {
+        return { ...employeeResponse, ...internResponse };
+      })
+      .then((finalResponse) => {
+        console.log(finalResponse);
+        let e = new Intern(
+          finalResponse.name,
+          id,
+          finalResponse.email,
+          finalResponse.school
+        );
+        id += 1;
+        console.log(e);
+        renderThis.push(e);
+        console.log(renderThis);
+      })
+      .then(() => {
+        inquirerMenu();
+      });
+  });
 };
-inquirerAboutNum = function (element) {
+
+inquirerMenu = function () {
   inquirer
     .prompt([
       {
-        type: "number",
-        name: `num`,
+        type: "list",
+        name: "employee",
         message: `
-      How many ${element}s are on the team`,
+  Which role on your team would you like to start?`,
+        choices: ["Manager", "Engineer", "Intern", "Finished"],
       },
     ])
     .then((NumAnswer) => {
-      console.log(`There are ${NumAnswer.num} ${element}s on the team`);
-      if (element === "Manager") {
-        inquirerAboutManager(NumAnswer.num);
-      } else if (element === "Engineer") {
-        inquirerAboutEngineer(NumAnswer.num);
-      } else if (element === "Intern") {
-        inquirerAboutIntern(NumAnswer.num);
+      console.log(`There are ${NumAnswer.employee}s on the team`);
+      if (NumAnswer.employee === "Manager") {
+        inquirerAboutManager();
+      } else if (NumAnswer.employee === "Engineer") {
+        inquirerAboutEngineer();
+      } else if (NumAnswer.employee === "Intern") {
+        inquirerAboutIntern();
+      } else if (NumAnswer.employee === "Finished") {
+        render(renderThis);
+        console.log("Team members rendered");
       }
     })
     .catch((err) => {
@@ -92,17 +172,9 @@ Software Team and generate an HTML document
 to display on your website. Press Enter to 
 begin`,
     },
-    {
-      type: "list",
-      name: "employee",
-      message: `
-Which role on your team would you like to start?`,
-      choices: ["Manager", "Engineer", "Intern"],
-    },
   ])
-  .then((choice) => {
-    console.log(choice);
-    inquirerAboutNum(choice.employee);
+  .then(() => {
+    inquirerMenu();
   })
   .catch((error) => {
     throw error;
