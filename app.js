@@ -152,7 +152,11 @@ inquirerMenu = function () {
       } else if (NumAnswer.employee === "Intern") {
         inquirerAboutIntern();
       } else if (NumAnswer.employee === "Finished") {
-        render(renderThis);
+        contentToWrite = render(renderThis);
+        fs.writeFile(outputPath, contentToWrite, (err) => {
+          if (err) throw err;
+          console.log("The file has been saved!");
+        });
         console.log("Team members rendered");
       }
     })
