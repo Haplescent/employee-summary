@@ -26,7 +26,6 @@ What is this employee's email?`,
       },
     ])
     .then((answer) => {
-      console.log(answer);
       return answer;
     })
     .catch((err) => {
@@ -48,7 +47,6 @@ What is this Manager's Office Number?`,
         return { ...employeeResponse, ...managerResponse };
       })
       .then((finalResponse) => {
-        console.log(finalResponse);
         let e = new Manager(
           finalResponse.name,
           id,
@@ -56,9 +54,7 @@ What is this Manager's Office Number?`,
           finalResponse.OfficeNum
         );
         id += 1;
-        console.log(e);
         renderThis.push(e);
-        console.log(renderThis);
         return finalResponse;
       })
       .then(() => {
@@ -81,7 +77,6 @@ What is this Emgineer's github username?`,
         return { ...employeeResponse, ...engineerResponse };
       })
       .then((finalResponse) => {
-        console.log(finalResponse);
         let e = new Engineer(
           finalResponse.name,
           id,
@@ -89,9 +84,7 @@ What is this Emgineer's github username?`,
           finalResponse.github
         );
         id += 1;
-        console.log(e);
         renderThis.push(e);
-        console.log(renderThis);
         return finalResponse;
       })
       .then(() => {
@@ -114,7 +107,6 @@ What school did this intern go to?`,
         return { ...employeeResponse, ...internResponse };
       })
       .then((finalResponse) => {
-        console.log(finalResponse);
         let e = new Intern(
           finalResponse.name,
           id,
@@ -122,9 +114,7 @@ What school did this intern go to?`,
           finalResponse.school
         );
         id += 1;
-        console.log(e);
         renderThis.push(e);
-        console.log(renderThis);
       })
       .then(() => {
         inquirerMenu();
@@ -144,7 +134,6 @@ inquirerMenu = function () {
       },
     ])
     .then((NumAnswer) => {
-      console.log(`There are ${NumAnswer.employee}s on the team`);
       if (NumAnswer.employee === "Manager") {
         inquirerAboutManager();
       } else if (NumAnswer.employee === "Engineer") {
@@ -155,7 +144,6 @@ inquirerMenu = function () {
         contentToWrite = render(renderThis);
         fs.writeFile(outputPath, contentToWrite, (err) => {
           if (err) throw err;
-          console.log("The file has been saved!");
         });
         console.log("Team members rendered");
       }
